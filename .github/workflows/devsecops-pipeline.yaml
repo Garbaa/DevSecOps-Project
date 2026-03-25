@@ -167,10 +167,11 @@ jobs:
 
       - name: Update Kubernetes Deployment Image Tag
         run: |
+          set -x
           NEW_IMAGE="ghcr.io/garbaa/devsecops-demo:${{ env.IMAGE_TAG }}"
           sed -i "s|image:.*|image: ${NEW_IMAGE}|g" kubernetes/deployment.yaml
           echo "Updated deployment to use image: ${NEW_IMAGE}"
-          grep "image:" kubernetes/deployment.yaml
+          grep "image:" kubernetes/deployment.yaml || true
 
       - name: Commit and Push Changes
         run: |
