@@ -1,0 +1,11 @@
+skip-check:
+  - CKV_K8S_43  # Skip image pull policy check for demo
+  - CKV_K8S_40  # Skip container resources check
+
+framework:
+  - kubernetes
+
+soft-fail: true
+
+
+
