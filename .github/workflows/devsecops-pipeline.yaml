@@ -6,17 +6,23 @@ on:
   pull_request:
     branches: [ main ]
 
+permissions:
+  security-events: write
+  contents: read
+
 jobs:
   security-scan:
     runs-on: ubuntu-latest
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
       # 1. SonarQube Scan (Code Quality & Security)
       - name: SonarQube Scan
-        uses: SonarSource/sonarqube-scan-action@v4
+        uses: sonarsource/sonarqube-scan-action@v5
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
@@ -55,28 +61,38 @@ jobs:
           output: 'trivy-image-results.sarif'
         continue-on-error: true
 
-      # 6. Checkov (IaC Security)
+      # 6. Checkov IaC Scan
       - name: Checkov Scan
         uses: bridgecrewio/checkov-action@master
         with:
           directory: ./kubernetes
           framework: kubernetes
           output_format: cli,sarif
+          output_file_path: checkov-results.sarif
+          soft_fail: true
+
+      # 7. Upload Trivy FS Results
+      - name: Upload Trivy FS Results
+        uses: github/codeql-action/upload-sarif@v4
+        with:
+          sarif_file: trivy-fs-results.sarif
+        continue-on-error: true
+
+      # 8. Upload Trivy Image Results
+      - name: Upload Trivy Image Results
+        uses: github/codeql-action/upload-sarif@v4
+        with:
+          sarif_file: trivy-image-results.sarif
+        continue-on-error: true
+
+      # 9. Upload Checkov Results
+      - name: Upload Checkov Results
+        uses: github/codeql-action/upload-sarif@v4
+        with:
           sarif_file: checkov-results.sarif
         continue-on-error: true
 
-      # 7. Upload all results to GitHub Security
-      - name: Upload Trivy Results
-        uses: github/codeql-action/upload-sarif@v3
-        with:
-          sarif_file: 'trivy-*.sarif'
-
-      - name: Upload Checkov Results
-        uses: github/codeql-action/upload-sarif@v3
-        with:
-          sarif_file: checkov-results.sarif
-
-      # 8. Upload OWASP report as artifact
+      # 10. Upload OWASP Report as Artifact
       - name: Upload OWASP Report
         uses: actions/upload-artifact@v4
         with:

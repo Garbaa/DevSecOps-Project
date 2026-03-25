@@ -1,21 +1,30 @@
+# kubernetes/deployment.yaml - add these fixes
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: tic-tac-toe
-  labels:
-    app: tic-tac-toe
+  name: your-app
+  namespace: production        # Fix CKV_K8S_21 - don't use default namespace
 spec:
-  replicas: 3
-  selector:
-    matchLabels:
-      app: tic-tac-toe
   template:
-    metadata:
-      labels:
-        app: tic-tac-toe
     spec:
+      securityContext:         # Fix CKV_K8S_29 - pod security context
+        seccompProfile:
+          type: RuntimeDefault # Fix CKV_K8S_31
       containers:
-      - name: tic-tac-toe
-        image: ghcr.io/garbaa/devsecops-project:${GITHUB_SHA}
-        ports:
-        - containerPort: 80
+        - name: your-app
+          resources:
+            limits:
+              memory: "256Mi"  # Fix CKV_K8S_13 - set memory limits
+              cpu: "500m"
+          imagePullPolicy: Always  # Fix CKV_K8S_15
+          securityContext:         # Fix CKV_K8S_30 - container security context
+            runAsNonRoot: true     # Fix CKV_K8S_23 - no root containers
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["NET_RAW", "ALL"]  # Fix CKV_K8S_28
+          readinessProbe:            # Fix CKV_K8S_9
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 5
+            periodSeconds: 10
