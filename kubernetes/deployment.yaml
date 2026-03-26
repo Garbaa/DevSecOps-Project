@@ -22,7 +22,7 @@ spec:
           type: RuntimeDefault
       containers:
         - name: tic-tac-toe
-          image: ghcr.io/garbaa/devsecops-demo:sha-01b5cbe06bfd420e5fe631dd32aee84e2bba696d
+          image: ghcr.io/garbaa/devsecops-demo:sha-fb6d05915e64491b3d69b6f8d64f034f9967c2f9
           imagePullPolicy: Always
           ports:
           - containerPort: 80
