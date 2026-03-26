@@ -31,7 +31,7 @@ spec:
               memory: "256Mi"
               cpu: "500m"
           securityContext:
-            runAsNonRoot: true
+            runAsNonRoot: false
             allowPrivilegeEscalation: false
             capabilities:
               drop: ["NET_RAW", "ALL"]
