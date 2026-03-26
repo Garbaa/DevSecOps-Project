@@ -1,28 +1,33 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: your-app
+  name: tic-tac-toe
   namespace: production
+  labels:
+    app: tic-tac-toe
 spec:
   replicas: 2
   selector:
     matchLabels:
-      app: your-app
+      app: tic-tac-toe
   template:
     metadata:
       labels:
-        app: your-app
+        app: tic-tac-toe
     spec:
       securityContext:
         seccompProfile:
           type: RuntimeDefault
       containers:
-        - name: your-app
+        - name: tic-tac-toe
+          image: ghcr.io/garbaa/devsecops-demo:latest
+          imagePullPolicy: Always
+          ports:
+          - containerPort: 80
           resources:
             limits:
               memory: "256Mi"
               cpu: "500m"
-          imagePullPolicy: Always
           securityContext:
             runAsNonRoot: true
             allowPrivilegeEscalation: false
