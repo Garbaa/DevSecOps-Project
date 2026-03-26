@@ -1,28 +1,34 @@
-# kubernetes/deployment.yaml - add these fixes
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: your-app
-  namespace: production        # Fix CKV_K8S_21 - don't use default namespace
+  namespace: production
 spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: your-app
   template:
+    metadata:
+      labels:
+        app: your-app
     spec:
-      securityContext:         # Fix CKV_K8S_29 - pod security context
+      securityContext:
         seccompProfile:
-          type: RuntimeDefault # Fix CKV_K8S_31
+          type: RuntimeDefault
       containers:
         - name: your-app
           resources:
             limits:
-              memory: "256Mi"  # Fix CKV_K8S_13 - set memory limits
+              memory: "256Mi"
               cpu: "500m"
-          imagePullPolicy: Always  # Fix CKV_K8S_15
-          securityContext:         # Fix CKV_K8S_30 - container security context
-            runAsNonRoot: true     # Fix CKV_K8S_23 - no root containers
+          imagePullPolicy: Always
+          securityContext:
+            runAsNonRoot: true
             allowPrivilegeEscalation: false
             capabilities:
-              drop: ["NET_RAW", "ALL"]  # Fix CKV_K8S_28
-          readinessProbe:            # Fix CKV_K8S_9
+              drop: ["NET_RAW", "ALL"]
+          readinessProbe:
             httpGet:
               path: /
               port: 80
