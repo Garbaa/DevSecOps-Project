@@ -19,7 +19,7 @@ spec:
       - name: ghcr-secret
       containers:
         - name: tic-tac-toe
-          image: ghcr.io/garbaa/devsecops-demo:sha-2409ee12ecfafec47fd0726a02bbdd0c404cc86e
+          image: ghcr.io/garbaa/devsecops-demo:sha-bd0e56c0fed92610d110af50891ce7882ea68bb1
           imagePullPolicy: Always
           ports:
           - containerPort: 80
